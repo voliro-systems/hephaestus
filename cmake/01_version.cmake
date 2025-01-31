@@ -41,10 +41,6 @@ if(error_version_check)
   message(WARNING "Repo version check failed. Will use \"${REPO_TAG}\"")
 endif()
 
-# Extract major, minor and patch versions. NOTE: works only for repo tag in format vX.Y.Z
-if(NOT ${REPO_TAG} MATCHES "^v([0-9]+)\\.([0-9]+)\\.([0-9]+)$")
-  message(FATAL_ERROR "Expected version tag in format v1.2.3, got ${REPO_TAG}")
-endif()
 string(REGEX MATCHALL "[0-9]+" VERSION_ELEMENTS "${REPO_TAG}")
 list(GET VERSION_ELEMENTS 0 VERSION_MAJOR)
 list(GET VERSION_ELEMENTS 1 VERSION_MINOR)

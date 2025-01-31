@@ -79,7 +79,7 @@ macro(add_cmake_dependency)
   endif()
 
   set(CMAKE_ARGS ${EP_CMAKE_EXTRA_ARGS})
-  list(APPEND CMAKE_ARGS ${TARGET_ARG_CMAKE_ARGS})
+  list(APPEND CMAKE_ARGS ${TARGET_ARG_CMAKE_ARGS} EXACT_REQUIRED)
 
   if(${TARGET_ARG_NAME} IN_LIST EXTERNAL_PROJECTS_LIST)
     find_package(${TARGET_ARG_NAME} ${TARGET_ARG_VERSION} QUIET)
@@ -92,36 +92,8 @@ macro(add_cmake_dependency)
       message(STATUS "    ${TARGET_ARG_NAME}: Using version ${TARGET_ARG_VERSION} from ${TARGET_DIR}")
       add_dummy_target(${TARGET_ARG_NAME})
     else()
-      message(STATUS "    ${TARGET_ARG_NAME}: Building ${TARGET_ARG_VERSION} from source")
-      if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.29")
-        set(DOWNLOAD_EXTRACT_TIMESTAMP_ARG "DOWNLOAD_EXTRACT_TIMESTAMP;TRUE")
-      else()
-        set(DOWNLOAD_EXTRACT_TIMESTAMP_ARG "")
-      endif()
-      if(TARGET_ARG_GIT_REPOSITORY)
-        ExternalProject_Add(
-          ${TARGET_ARG_NAME}
-          DEPENDS ${TARGET_ARG_DEPENDS}
-          GIT_REPOSITORY ${TARGET_ARG_GIT_REPOSITORY}
-          GIT_TAG ${TARGET_ARG_GIT_TAG}
-          LIST_SEPARATOR |
-          CMAKE_ARGS ${CMAKE_ARGS}
-          GIT_SHALLOW true
-          GIT_SUBMODULES_RECURSE false
-          SOURCE_SUBDIR ${TARGET_ARG_SOURCE_SUBDIR}
-          ${DOWNLOAD_EXTRACT_TIMESTAMP_ARG}
-        )
-      else()
-        ExternalProject_Add(
-          ${TARGET_ARG_NAME}
-          DEPENDS ${TARGET_ARG_DEPENDS}
-          URL ${TARGET_ARG_URL}
-          LIST_SEPARATOR |
-          CMAKE_ARGS ${CMAKE_ARGS}
-          SOURCE_SUBDIR ${TARGET_ARG_SOURCE_SUBDIR}
-          ${DOWNLOAD_EXTRACT_TIMESTAMP_ARG}
-        )
-      endif()
+      # NOTE(@floriantschopp): In our current implementation, we only support ament packages as dependencies and don't want heph to pull its own dependencies.
+      message(FATAL_ERROR "${TARGET_ARG_VERSION} not found, please provide an ament package for it")
     endif()
   endif()
 endmacro()

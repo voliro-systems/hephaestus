@@ -19,6 +19,7 @@
 
 #include <absl/log/log.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <zenoh.h>
 #include <zenoh/api/base.hxx>
 #include <zenoh/api/channels.hxx>
@@ -40,8 +41,12 @@
 
 namespace heph::ipc::zenoh {
 
+class ServiceBase {
+public:
+  virtual ~ServiceBase() = default;
+};
 template <typename RequestT, typename ReplyT>
-class Service {
+class Service : public ServiceBase {
 public:
   using Callback = std::function<ReplyT(const RequestT&)>;
   using FailureCallback = std::function<void()>;

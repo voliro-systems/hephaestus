@@ -122,7 +122,7 @@ add_cmake_dependency(
 
 # --------------------------------------------------------------------------------------------------
 # magic_enum
-set(MAGIC_ENUM_VERSION 0.9.5)
+set(MAGIC_ENUM_VERSION 0.9.6)
 set(MAGIC_ENUM_TAG v${MAGIC_ENUM_VERSION})
 set(MAGIC_ENUM_CMAKE_ARGS -DMAGIC_ENUM_OPT_BUILD_EXAMPLES=OFF -DMAGIC_ENUM_OPT_BUILD_TESTS=OFF
                           -DMAGIC_ENUM_OPT_INSTALL=ON
@@ -138,13 +138,11 @@ add_cmake_dependency(
 # --------------------------------------------------------------------------------------------------
 # fmt
 set(FMT_VERSION 11.0.2)
-set(FMT_CMAKE_ARGS -DFMT_MASTER_PROJECT=OFF)
 add_cmake_dependency(
   NAME fmt
   VERSION ${FMT_VERSION}
   GIT_REPOSITORY "https://github.com/fmtlib/fmt.git"
   GIT_TAG ${FMT_VERSION}
-  CMAKE_ARGS ${FMT_CMAKE_ARGS}
 )
 
 # --------------------------------------------------------------------------------------------------

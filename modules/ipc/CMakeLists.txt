@@ -16,7 +16,8 @@ find_package(nlohmann_json REQUIRED)
 find_package(zenohc REQUIRED)
 find_package(zenohcxx REQUIRED)
 
-add_subdirectory(proto)
+# TODO(@floriantschopp): [ActionServer] Reactivate and fix CI
+# add_subdirectory(proto)
 
 # library sources
 set(SOURCES
@@ -34,10 +35,11 @@ set(SOURCES
     src/zenoh/session.cpp
     src/zenoh/subscriber.cpp
     src/zenoh/topic_database.cpp
-    src/zenoh/action_server/action_server.cpp
-    src/zenoh/action_server/client_helper.cpp
-    src/zenoh/action_server/types.cpp
-    src/zenoh/action_server/types_proto.cpp
+    # TODO(@floriantschopp): [ActionServer] Reactivate and fix CI
+    # src/zenoh/action_server/action_server.cpp
+    # src/zenoh/action_server/client_helper.cpp
+    # src/zenoh/action_server/types.cpp
+    # src/zenoh/action_server/types_proto.cpp
     README.md
     include/hephaestus/ipc/topic.h
     include/hephaestus/ipc/topic_database.h
@@ -51,10 +53,11 @@ set(SOURCES
     include/hephaestus/ipc/zenoh/service.h
     include/hephaestus/ipc/zenoh/scout.h
     include/hephaestus/ipc/zenoh/subscriber.h
-    include/hephaestus/ipc/zenoh/action_server/action_server.h
-    include/hephaestus/ipc/zenoh/action_server/client_helper.h
-    include/hephaestus/ipc/zenoh/action_server/types.h
-    include/hephaestus/ipc/zenoh/action_server/types_proto.h
+    # TODO(@floriantschopp): [ActionServer] Reactivate and fix CI
+    # include/hephaestus/ipc/zenoh/action_server/action_server.h
+    # include/hephaestus/ipc/zenoh/action_server/client_helper.h
+    # include/hephaestus/ipc/zenoh/action_server/types.h
+    # include/hephaestus/ipc/zenoh/action_server/types_proto.h
 )
 
 # library target
@@ -71,7 +74,8 @@ define_module_library(
     hephaestus::cli
     hephaestus::utils
     hephaestus::serdes
-    hephaestus::action_server_types_proto
+    # TODO(@floriantschopp): [ActionServer] Reactivate and fix CI
+    # hephaestus::action_server_types_proto
     fmt::fmt
     nlohmann_json::nlohmann_json
     range-v3::range-v3

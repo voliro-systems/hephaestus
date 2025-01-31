@@ -10,6 +10,8 @@
 #include <string>
 #include <type_traits>
 
+#include <absl/log/check.h>
+
 #ifdef DISABLE_EXCEPTIONS
 #include <fmt/format.h>
 #endif

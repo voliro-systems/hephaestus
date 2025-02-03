@@ -26,9 +26,17 @@ heph_cc_library(
         "//modules/utils",
         "@fmt",
         "@nlohmann_json//:json",
-        "@zenohc_builder//:zenoh-c",
-        "@zenohc_builder//:zenoh-cpp",
-    ],
+    ] + select({
+        "@com_voliro_main//:linux_x86_64": [
+            "@zenohc_builder_x86_64//:zenoh-c",
+            "@zenohc_builder_x86_64//:zenoh-cpp",
+        ],
+        "@com_voliro_main//:linux_aarch64": [
+            "@zenohc_builder_aarch64//:zenoh-c",
+            "@zenohc_builder_aarch64//:zenoh-cpp",
+        ],
+        "//conditions:default": [],
+    }),
 )
 
 ############

@@ -305,7 +305,6 @@ macro(define_module_library)
 
   add_library(${LIBRARY_NAME} ${TARGET_ARG_SOURCES})
   add_library(${LIBRARY_NAME_ALIAS} ALIAS ${LIBRARY_NAME})
-  add_clang_format(${LIBRARY_NAME})
 
   if(NOT TARGET_ARG_NOINSTALL)
     set(MODULE_${MODULE_NAME}_LIB_TARGETS
@@ -388,7 +387,6 @@ macro(define_module_example)
   set(TARGET_NAME ${MODULE_NAME}_${TARGET_ARG_NAME})
 
   add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${TARGET_ARG_SOURCES})
-  add_clang_format(${TARGET_NAME})
 
   add_dependencies(${EXAMPLES_TARGET} ${TARGET_NAME}) # Set this example to be built on `make examples`
 
@@ -441,7 +439,6 @@ macro(define_module_executable)
   set(TARGET_NAME ${PROJECT_NAME}_${TARGET_ARG_NAME})
 
   add_executable(${TARGET_NAME} ${TARGET_ARG_SOURCES})
-  add_clang_format(${TARGET_NAME})
 
   set(MODULE_${MODULE_NAME}_EXE_TARGETS
       ${MODULE_${MODULE_NAME}_EXE_TARGETS} ${TARGET_NAME}
@@ -663,7 +660,6 @@ macro(define_module_test)
   set(TARGET_NAME ${MODULE_NAME}_${TARGET_ARG_NAME})
 
   add_executable(${TARGET_NAME} EXCLUDE_FROM_ALL ${TARGET_ARG_SOURCES}) # Don't build on `make`
-  add_clang_format(${TARGET_NAME})
 
   target_include_directories(
     ${TARGET_NAME} BEFORE

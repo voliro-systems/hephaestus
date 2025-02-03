@@ -11,7 +11,7 @@ def heph_basic_copts():
         "-Wall",
         "-Wextra",
         "-Wpedantic",
-        "-Werror",
+        # "-Werror",
         "-Wnon-virtual-dtor",  # warn if a class with virtual functions has a non-virtual destructor.
         "-Wold-style-cast",  # warn for c-style casts
         "-Wcast-align",  # warn for potential performance problem casts

@@ -8,7 +8,29 @@ def foreign_cc_repositories():
     ZENOH_VERSION = "1.0.0"
     http_archive(
         name = "zenohc_builder",
-        build_file = ":foreign_cc/zenohc_builder.BUILD",
+        build_file_content = """
+cc_library(
+    name = "zenoh-c",
+    srcs = ["lib/libzenohc.a"],
+    hdrs = glob(["include/**/*.h"]),
+    includes = ["include"],
+    defines = [
+        "ZENOH_WITH_UNSTABLE_API",
+        "ZENOHCXX_ZENOHC",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "zenoh-cpp",
+    hdrs = glob([
+        "include/**/*.hxx",
+    ]),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    deps = [":zenoh-c"],
+)
+        """,
         urls = ["https://github.com/olympus-robotics/zenohc_builder/archive/refs/tags/{version}.zip".format(version = ZENOH_VERSION)],
         strip_prefix = "zenohc_builder-{version}".format(version = ZENOH_VERSION),
         sha256 = "15605cf7fd83e390f82404c0545c247a2921302ef8f419559c8829e6b2c890d5",

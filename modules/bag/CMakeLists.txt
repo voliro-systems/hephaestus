@@ -11,6 +11,7 @@ declare_module(
 
 find_package(absl REQUIRED)
 find_package(mcap REQUIRED)
+find_package(zstd)
 
 # library sources
 set(SOURCES

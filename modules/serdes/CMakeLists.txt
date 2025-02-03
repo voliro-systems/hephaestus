@@ -10,7 +10,7 @@ declare_module(
 
 find_package(absl REQUIRED)
 find_package(magic_enum REQUIRED)
-find_package(Protobuf REQUIRED)
+find_package(Protobuf 27.2.0 CONFIG REQUIRED)
 find_package(utf8_range REQUIRED)
 find_package(range-v3 REQUIRED)
 

@@ -44,6 +44,7 @@ define_module_library(
     absl::raw_hash_set
     absl::status
     absl::statusor
+    absl::raw_hash_map
     hephaestus::utils
     magic_enum::magic_enum
     protobuf::libprotobuf

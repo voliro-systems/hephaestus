@@ -112,14 +112,14 @@ using StatusUpdateCallback = std::function<void(const StatusT&)>;
 ///   - The updates are decided by the user implementation of the action server.
 /// - Returns a future which will eventually contain the response from the server.
 template <typename RequestT, typename StatusT, typename ReplyT>
-[[nodiscard]] auto callActionServer(SessionPtr session, const TopicConfig& topic_config,
-                                    const RequestT& request, StatusUpdateCallback<StatusT>&& status_update_cb,
-                                    std::chrono::milliseconds request_timeout)
-    -> std::future<Response<ReplyT>>;
+[[nodiscard]] auto
+callActionServer(SessionPtr session, const TopicConfig& topic_config, const RequestT& request,
+                 StatusUpdateCallback<StatusT>&& status_update_cb,
+                 std::chrono::milliseconds request_timeout) -> std::future<Response<ReplyT>>;
 
 /// Request the action server to stop.
-[[nodiscard]] auto requestActionServerToStopExecution(Session& session, const TopicConfig& topic_config)
-    -> bool;
+[[nodiscard]] auto requestActionServerToStopExecution(Session& session,
+                                                      const TopicConfig& topic_config) -> bool;
 
 // TODO: add a function to get notified when the server is idle again.
 

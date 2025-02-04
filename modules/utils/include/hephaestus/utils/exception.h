@@ -45,7 +45,7 @@ constexpr void throwException(const std::string& message,
 #else
   auto e = T{ message, location };
   CHECK(false) << fmt::format("[ERROR {}] {} at {}:{}", e.what(), message, location.file_name(),
-                                   location.line());
+                              location.line());
 #endif
 }
 
@@ -66,7 +66,7 @@ constexpr void throwExceptionIf(bool condition, const std::string& message,
 #else
   auto e = T{ message, location };
   CHECK(!condition) << fmt::format("[ERROR {}] {} at {}:{}", e.what(), message, location.file_name(),
-                                        location.line());
+                                   location.line());
 #endif
 }
 

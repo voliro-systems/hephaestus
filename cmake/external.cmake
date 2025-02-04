@@ -93,7 +93,7 @@ macro(add_cmake_dependency)
       add_dummy_target(${TARGET_ARG_NAME})
     else()
       # NOTE(@floriantschopp): In our current implementation, we only support ament packages as dependencies and don't want heph to pull its own dependencies.
-      message(FATAL_ERROR "${TARGET_ARG_VERSION} not found, please provide an ament package for it")
+      message(FATAL_ERROR "${TARGET_ARG_NAME} version ${TARGET_ARG_VERSION} not found, please provide an ament package for it")
     endif()
   endif()
 endmacro()

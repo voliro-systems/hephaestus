@@ -21,10 +21,12 @@ def heph_basic_copts():
         "-Wconversion",  # warn on type conversions that may lose data
         "-Wsign-conversion",  # warn on sign conversions
         "-Wnull-dereference",  # warn if a null dereference is detected
-        "-Wdouble-promotion",  # warn if float is implicit promoted to double
+        # "-Wdouble-promotion",  # warn if float is implicit promoted to double -> VOLIRO SPECIFIC
         "-Wformat=2",  # warn on security issues around functions that format output (ie printf)
         "-Wimplicit-fallthrough",  # warn on statements that fallthrough without an explicit annotation
         "-Iexternal/abseil-cpp~",  # This is needed to avoid the error: file not found with <angled> include; use "quotes" instead
+        "-Iexternal/abseil-cpp+",  # (Bazel >=8.0.0 version of the above)
+        "-Wno-gcc-compat",  # disable compatibility warnings for GCC -> VOLIRO SPECIFIC
     ] + select({
         "@hephaestus//bazel:opt_compilation": ["-O3"],
         "//conditions:default": [],

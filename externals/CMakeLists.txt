@@ -127,7 +127,7 @@ add_cmake_dependency(
 
 # --------------------------------------------------------------------------------------------------
 # magic_enum
-set(MAGIC_ENUM_VERSION 0.9.5)
+set(MAGIC_ENUM_VERSION 0.9.6)
 set(MAGIC_ENUM_TAG v${MAGIC_ENUM_VERSION})
 set(MAGIC_ENUM_CMAKE_ARGS -DMAGIC_ENUM_OPT_BUILD_EXAMPLES=OFF -DMAGIC_ENUM_OPT_BUILD_TESTS=OFF
                           -DMAGIC_ENUM_OPT_INSTALL=ON
@@ -165,11 +165,11 @@ add_cmake_dependency(
 # --------------------------------------------------------------------------------------------------
 # reflect-cpp
 set(REFLECT_CPP_VERSION 0.16.0)
-set(REFLECT_CPP_TAG v${REFLECT_CPP_VERSION})
+set(REFLECT_CPP_TAG v${REFLECT_CPP_VERSION}-cmake-3.22.1)
 add_cmake_dependency(
   NAME reflectcpp
   DEPENDS ${REFLECT_CPP_DEPENDS}
-  GIT_REPOSITORY https://github.com/getml/reflect-cpp.git
+  GIT_REPOSITORY https://github.com/voliro-systems/reflect-cpp.git
   GIT_TAG ${REFLECT_CPP_TAG}
   CMAKE_ARGS -DREFLECTCPP_YAML=ON -DCMAKE_BUILD_TYPE=Debug
 )

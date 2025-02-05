@@ -8,7 +8,29 @@ def foreign_cc_repositories():
     ZENOH_VERSION = "1.1.1"
     http_archive(
         name = "zenohc_builder",
-        build_file = ":foreign_cc/zenohc_builder.BUILD",
+        build_file_content = """
+cc_library(
+    name = "zenoh-c",
+    srcs = ["lib/libzenohc.a"],
+    hdrs = glob(["include/**/*.h"]),
+    includes = ["include"],
+    defines = [
+        "ZENOH_WITH_UNSTABLE_API",
+        "ZENOHCXX_ZENOHC",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "zenoh-cpp",
+    hdrs = glob([
+        "include/**/*.hxx",
+    ]),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    deps = [":zenoh-c"],
+)
+        """,
         urls = ["https://github.com/olympus-robotics/zenohc_builder/archive/refs/tags/{version}.zip".format(version = ZENOH_VERSION)],
         strip_prefix = "zenohc_builder-{version}".format(version = ZENOH_VERSION),
         sha256 = "ef44926100b10a4e75b12e64344295ac0bdc8549a2f40fcd3f7a6eb95631104a",
@@ -46,7 +68,7 @@ def foreign_cc_repositories():
     http_archive(
         name = "reflect-cpp",
         build_file = "//bazel/foreign_cc:reflect_cpp.BUILD",
-        urls = ["https://github.com/getml/reflect-cpp/archive/v{version}.zip".format(version = REFLECT_CPP_VERSION)],
-        strip_prefix = "reflect-cpp-" + REFLECT_CPP_VERSION,
-        sha256 = "16494784cf7af86a9903213eb4f654579258d44502b6fc8b1b50467c66b5a4a3",
+        urls = ["https://github.com/voliro-systems/reflect-cpp/archive/refs/tags/v{version}-cmake-3.22.1.zip".format(version = REFLECT_CPP_VERSION)],
+        strip_prefix = "reflect-cpp-" + REFLECT_CPP_VERSION + "-cmake-3.22.1",
+        sha256 = "63fd52189f7df9c5648c5479e7af9377271a18f65a30a1a45fe160f8e0cf787a",
     )

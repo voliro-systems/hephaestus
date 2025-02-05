@@ -55,7 +55,7 @@ struct ActionServerData {
                                            DummyActionServer::ExecuteCallback&& execute_cb)
     -> ActionServerData {
   static constexpr int TOPIC_LENGTH = 10;
-  auto service_topic = ipc::TopicConfig(
+  auto service_topic = ipc::createTopicConfig(
       fmt::format("test_action_server/{}", random::random<std::string>(mt, TOPIC_LENGTH, false, true)));
 
   auto server_session = createSession(createLocalConfig());

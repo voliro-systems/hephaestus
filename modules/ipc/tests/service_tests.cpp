@@ -28,7 +28,7 @@ TEST(ZenohTests, ServiceCallExchange) {
   const auto request_message = types::DummyType::random(mt);
 
   const auto service_topic =
-      ipc::TopicConfig(fmt::format("test_service/{}", random::random<std::string>(mt, 10, false, true)));
+      ipc::createTopicConfig(fmt::format("test_service/{}", random::random<std::string>(mt, 10, false, true)));
 
   auto session = createSession(createLocalConfig());
 
@@ -48,7 +48,7 @@ TEST(ZenohTests, TypesMismatch) {
   auto mt = random::createRNG();
 
   const auto service_topic =
-      ipc::TopicConfig(fmt::format("test_service/{}", random::random<std::string>(mt, 10, false, true)));
+      ipc::createTopicConfig(fmt::format("test_service/{}", random::random<std::string>(mt, 10, false, true)));
 
   auto session = createSession(createLocalConfig());
 

@@ -12,9 +12,10 @@
 #include "hephaestus/utils/exception.h"
 
 namespace heph::ipc {
-TopicConfig::TopicConfig(std::string topic_name) : name(std::move(topic_name)) {
-  if (name.empty() || name.starts_with('/') || name.ends_with('/')) {
-    throwException<InvalidParameterException>(fmt::format("invalid topic name: '{}'", name));
+[[nodiscard]] TopicConfig createTopicConfig(const std::string& topic_name) {
+  if (topic_name.empty() || topic_name.starts_with('/') || topic_name.ends_with('/')) {
+    throw std::invalid_argument(fmt::format("invalid topic name: '{}'", topic_name));
   }
+  return { .name = topic_name };
 }
 }  // namespace heph::ipc

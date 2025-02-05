@@ -24,7 +24,7 @@ TEST(ZenohTests, WrongSubsriberTypeLargeIntoSmall) {
   auto mt = random::createRNG();
   ipc::zenoh::Config config{};
   auto session = ipc::zenoh::createSession(std::move(config));
-  const auto topic = ipc::TopicConfig("test_topic");
+  const auto topic = ipc::createTopicConfig("test_topic");
 
   const auto send_message = randomFramedPose(mt);
   auto received_message = Pose{};
@@ -47,7 +47,7 @@ TEST(ZenohTests, WrongSubsriberTypeLargeIntoSmall) {
 TEST(ZenohTests, WrongSubsriberTypeSmallIntoLarge) {
   auto mt = random::createRNG();
   auto session = ipc::zenoh::createSession(ipc::zenoh::createLocalConfig());
-  const auto topic = ipc::TopicConfig("test_topic");
+  const auto topic = ipc::createTopicConfig("test_topic");
 
   const auto send_message = randomPose(mt);
   auto received_message = FramedPose{};

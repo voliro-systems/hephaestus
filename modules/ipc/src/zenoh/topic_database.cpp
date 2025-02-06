@@ -27,7 +27,7 @@ public:
   explicit ZenohTopicDatabase(zenoh::SessionPtr session);
   ~ZenohTopicDatabase() override = default;
 
-  [[nodiscard]] auto getTypeInfo(const std::string& topic) -> const serdes::TypeInfo& override;
+  [[nodiscard]] auto getTypeInfo(const std::string& topic) -> std::optional<serdes::TypeInfo> override;
 
 private:
   zenoh::SessionPtr session_;
@@ -39,7 +39,7 @@ private:
 ZenohTopicDatabase::ZenohTopicDatabase(zenoh::SessionPtr session) : session_(std::move(session)) {
 }
 
-auto ZenohTopicDatabase::getTypeInfo(const std::string& topic) -> const serdes::TypeInfo& {
+auto ZenohTopicDatabase::getTypeInfo(const std::string& topic) -> std::optional<serdes::TypeInfo> {
   {
     const absl::MutexLock lock{ &mutex_ };
     if (topics_type_db_.contains(topic)) {
@@ -50,11 +50,16 @@ auto ZenohTopicDatabase::getTypeInfo(const std::string& topic) -> const serdes::
   auto query_topic = zenoh::getTypeInfoServiceTopic(topic);
 
   static constexpr auto TIMEOUT = std::chrono::milliseconds{ 5000 };
-  const auto response =
-      zenoh::callService<std::string, std::string>(*session_, TopicConfig{ query_topic }, "", TIMEOUT);
-  throwExceptionIf<heph::InvalidDataException>(
-      response.size() != 1,
-      fmt::format("received {} responses for type from service {}", response.size(), query_topic));
+  const auto response = zenoh::callService<std::string, std::string>(
+      *session_, TopicConfig{ .name = query_topic }, "", TIMEOUT);
+
+  if (response.empty()) {
+    LOG(ERROR) << fmt::format("received no response for type from service {}", query_topic);
+    return std::nullopt;
+  }
+
+  LOG_IF(WARNING, response.empty()) << fmt::format(
+      "received multiple ({}) responses for type from service {}", response.size(), query_topic);
 
   const absl::MutexLock lock{ &mutex_ };
   // While waiting for the query someone else could have added the topic to the DB.

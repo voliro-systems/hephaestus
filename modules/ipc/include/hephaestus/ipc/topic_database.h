@@ -15,7 +15,7 @@ class ITopicDatabase {
 public:
   virtual ~ITopicDatabase() = default;
 
-  [[nodiscard]] virtual auto getTypeInfo(const std::string& topic) -> const serdes::TypeInfo& = 0;
+  [[nodiscard]] virtual auto getTypeInfo(const std::string& topic) -> std::optional<serdes::TypeInfo> = 0;
 };
 
 namespace zenoh {

@@ -79,9 +79,14 @@ void DynamicSubscriber::onPublisherAdded(const EndpointInfo& info) {
   }
 
   if (init_subscriber_cb_) {
-    auto type_info = topic_db_->getTypeInfo(info.topic);
-    init_subscriber_cb_(info.topic, type_info);
-    optional_type_info = std::move(type_info);
+    optional_type_info = topic_db_->getTypeInfo(info.topic);
+
+    if (optional_type_info.has_value()) {
+      init_subscriber_cb_(info.topic, optional_type_info.value());
+    } else {
+      LOG(ERROR) << fmt::format("Failed to get type info for topic: {} - cannot call init subscriber!",
+                                info.topic);
+    }
   }
 
   heph::log(heph::DEBUG, "create subscriber", "topic", info.topic);

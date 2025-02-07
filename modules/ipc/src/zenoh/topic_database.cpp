@@ -54,12 +54,14 @@ auto ZenohTopicDatabase::getTypeInfo(const std::string& topic) -> std::optional<
       *session_, TopicConfig{ .name = query_topic }, "", TIMEOUT);
 
   if (response.empty()) {
-    LOG(ERROR) << fmt::format("received no response for type from service {}", query_topic);
+    heph::log(heph::ERROR, fmt::format("received no response for type from service {}", query_topic));
     return std::nullopt;
   }
 
-  LOG_IF(WARNING, response.empty()) << fmt::format(
-      "received multiple ({}) responses for type from service {}", response.size(), query_topic);
+  if (response.size() > 1) {
+    heph::log(heph::WARN, fmt::format("received multiple ({}) response for type from service {}",
+                                      response.size(), query_topic));
+  }
 
   const absl::MutexLock lock{ &mutex_ };
   // While waiting for the query someone else could have added the topic to the DB.

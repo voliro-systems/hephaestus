@@ -30,7 +30,7 @@ endif()
 
 # Extract version information
 execute_process(
-  COMMAND git describe --tags --abbrev=0
+  COMMAND git describe --tags --abbrev=0 --match "v[0-9]*.[0-9]*.[0-9]*"
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   OUTPUT_VARIABLE REPO_TAG
   ERROR_VARIABLE error_version_check
@@ -48,4 +48,4 @@ list(GET VERSION_ELEMENTS 2 VERSION_PATCH)
 set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 # print all that
-message(STATUS "Version: ${VERSION}, branch: \"${REPO_BRANCH}\", commit hash: ${REPO_HASH}")
+message(STATUS "HEPHAESTUS: version: ${VERSION}, branch: \"${REPO_BRANCH}\", commit hash: ${REPO_HASH}")

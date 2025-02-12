@@ -116,8 +116,8 @@ RawSubscriber::RawSubscriber(SessionPtr session, TopicConfig topic_config, DataC
           try {
             callback_(metadata, std::span<const std::byte>(buffer.begin(), buffer.end()));
           } catch (std::exception& e) {
-            LOG(FATAL) << fmt::format("Uncaught exception in RawSubscriber callback: {}. Exception: {}",
-                                      topic_config_.name, e.what());
+            heph::log(heph::FATAL, "Uncaught exception in RawSubscriber callback", "topic",
+                      topic_config_.name, "exception", e.what());
           }
         },
         DEFAULT_CACHE_RESERVES);

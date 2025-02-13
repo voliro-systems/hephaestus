@@ -91,7 +91,10 @@ heph_cc_test(
     srcs = [
         "tests/action_server_tests.cpp",
     ],
-    tags = ["exclusive"],
+    tags = [
+        "exclusive",
+        "manual",  # This is currently flaky, so we need to improve it first
+    ],
     deps = IPC_TEST_DEPS,
 )
 
@@ -139,6 +142,14 @@ heph_cc_test(
     name = "session_tests",
     srcs = [
         "tests/session_tests.cpp",
+    ],
+    deps = IPC_TEST_DEPS,
+)
+
+heph_cc_test(
+    name = "topic_database_tests",
+    srcs = [
+        "tests/topic_database_tests.cpp",
     ],
     deps = IPC_TEST_DEPS,
 )

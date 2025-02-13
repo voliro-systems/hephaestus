@@ -22,8 +22,9 @@ class StopWatch {
 public:
   using ClockT = std::chrono::steady_clock;
   using DurationT = ClockT::duration;
+  using NowFunctionPtr = std::chrono::steady_clock::time_point (*)();
 
-  StopWatch();
+  explicit StopWatch(NowFunctionPtr now_fn = &ClockT::now);
 
   /// Start new lap. Does nothing if already ticking.
   void start();
@@ -53,7 +54,7 @@ public:
   [[nodiscard]] auto accumulatedLapsDuration() const -> DurationT;
 
   /// \return Timestamp of the first `start()` call after the last `reset()`.
-  [[nodiscard]] auto initialStartTimestamp() const -> std::optional<ClockT::time_point>;
+  [[nodiscard]] auto initialStartTimestamp() const -> std::optional<typename ClockT::time_point>;
 
   /// \return the number of times the timer has been stopped and re-started.
   [[nodiscard]] auto lapsCount() const -> std::size_t;
@@ -64,23 +65,26 @@ private:
   [[nodiscard]] auto elapsedImpl() -> DurationT;
 
 private:
-  std::optional<ClockT::time_point> lap_start_timestamp_;      //!< Timestamp at start().
-  std::optional<ClockT::time_point> initial_start_timestamp_;  //!< Timestamp at first start() after reset().
-  std::optional<ClockT::time_point> lapse_timestamp_;          //!< Timestamp at lapse().
-  std::chrono::nanoseconds accumulated_time_{ 0 };             //!< The time accumulated between start() and
-                                                               //!< stop() calls, after the last reset() call.
+  NowFunctionPtr now_fn_;
+
+  std::optional<typename ClockT::time_point> lap_start_timestamp_;      //!< Timestamp at start().
+  std::optional<typename ClockT::time_point> initial_start_timestamp_;  //!< Timestamp at first start() after
+                                                                        //!< reset().
+  std::optional<typename ClockT::time_point> lapse_timestamp_;          //!< Timestamp at lapse().
+  std::chrono::nanoseconds accumulated_time_{ 0 };  //!< The time accumulated between start() and
+                                                    //!< stop() calls, after the last reset() call.
   std::size_t lap_counter_{ 0 };  //!< Counts how many time stop() have been called after the last
                                   //!< reset().
 };
 
 template <typename TargetDurationT>
-auto StopWatch::lapse() -> TargetDurationT {
-  return std::chrono::duration_cast<TargetDurationT>(lapseImpl());
+auto StopWatch::stop() -> TargetDurationT {
+  return std::chrono::duration_cast<TargetDurationT>(stopImpl());
 }
 
 template <typename TargetDurationT>
-auto StopWatch::stop() -> TargetDurationT {
-  return std::chrono::duration_cast<TargetDurationT>(stopImpl());
+auto StopWatch::lapse() -> TargetDurationT {
+  return std::chrono::duration_cast<TargetDurationT>(lapseImpl());
 }
 
 template <typename TargetDurationT>

@@ -10,6 +10,7 @@
 #include <functional>
 #include <memory>
 #include <optional>
+#include <span>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -36,6 +37,7 @@
 #include "hephaestus/ipc/zenoh/session.h"
 #include "hephaestus/serdes/protobuf/concepts.h"
 #include "hephaestus/serdes/serdes.h"
+#include "hephaestus/serdes/type_info.h"
 #include "hephaestus/telemetry/log.h"
 #include "hephaestus/utils/exception.h"
 
@@ -62,6 +64,7 @@ public:
 
 private:
   void onQuery(const ::zenoh::Query& query);
+  void createTypeInfoService();
 
 private:
   SessionPtr session_;
@@ -72,6 +75,9 @@ private:
   Callback callback_;
   FailureCallback failure_callback_;
   PostReplyCallback post_reply_callback_;
+
+  serdes::ServiceTypeInfo type_info_;
+  std::unique_ptr<Service<std::string, std::string>> type_info_service_;
 };
 
 template <typename ReplyT>
@@ -83,6 +89,14 @@ struct ServiceResponse {
 template <typename RequestT, typename ReplyT>
 auto callService(Session& session, const TopicConfig& topic_config, const RequestT& request,
                  std::chrono::milliseconds timeout) -> std::vector<ServiceResponse<ReplyT>>;
+
+auto callServiceRaw(Session& session, const TopicConfig& topic_config, std::span<const std::byte> buffer,
+                    std::chrono::milliseconds timeout)
+    -> std::vector<ServiceResponse<std::vector<std::byte>>>;
+
+[[nodiscard]] auto getEndpointTypeInfoServiceTopic(const std::string& topic) -> std::string;
+/// Return true if the input topic correspond to the service type info topic.
+[[nodiscard]] auto isEndpointTypeInfoServiceTopic(const std::string& topic) -> bool;
 
 // -----------------------------------------------------------------------------------------------
 // Implementation
@@ -113,9 +127,12 @@ constexpr void checkTemplatedTypes() {
 template <typename RequestT, typename ReplyT>
 [[nodiscard]] auto checkQueryTypeInfo(const ::zenoh::Query& query) -> bool {
   const auto attachment = query.get_attachment();
+  // If the attachment is missing the type info, we can't check for the type match.
+  // We return true as we do want to support query with missing type info.
   if (!attachment.has_value()) {
-    heph::log(heph::WARN, "query is missing attachments", "service", query.get_keyexpr().as_string_view());
-    return false;
+    heph::log(heph::WARN, "query is missing attachments, cannot check that the type matches", "service",
+              query.get_keyexpr().as_string_view());
+    return true;
   }
 
   auto attachment_data =
@@ -231,6 +248,10 @@ getServiceCallResponses(const ::zenoh::channels::FifoChannel::HandlerType<::zeno
 
 }  // namespace internal
 
+// -----------------------------------------------------------------------------------------------
+// Implementation - Service
+// -----------------------------------------------------------------------------------------------
+
 template <typename RequestT, typename ReplyT>
 Service<RequestT, ReplyT>::Service(SessionPtr session, TopicConfig topic_config, Callback&& callback,
                                    FailureCallback&& failure_callback,
@@ -239,9 +260,13 @@ Service<RequestT, ReplyT>::Service(SessionPtr session, TopicConfig topic_config,
   , topic_config_(std::move(topic_config))
   , callback_(std::move(callback))
   , failure_callback_(std::move(failure_callback))
-  , post_reply_callback_(std::move(post_reply_callback)) {
+  , post_reply_callback_(std::move(post_reply_callback))
+  , type_info_({ .request = serdes::getSerializedTypeInfo<RequestT>(),
+                 .reply = serdes::getSerializedTypeInfo<ReplyT>() }) {
   internal::checkTemplatedTypes<RequestT, ReplyT>();
   heph::log(heph::DEBUG, "started service", "name", topic_config_.name);
+
+  createTypeInfoService();
 
   auto on_query_cb = [this](const ::zenoh::Query& query) mutable { onQuery(query); };
 
@@ -298,6 +323,21 @@ void Service<RequestT, ReplyT>::onQuery(const ::zenoh::Query& query) {
 }
 
 template <typename RequestT, typename ReplyT>
+void Service<RequestT, ReplyT>::createTypeInfoService() {
+  if (isEndpointTypeInfoServiceTopic(topic_config_.name)) {
+    return;
+  }
+
+  type_info_service_ = std::make_unique<Service<std::string, std::string>>(
+      session_, TopicConfig{ getEndpointTypeInfoServiceTopic(topic_config_.name) },
+      [this](const std::string&) { return this->type_info_.toJson(); });
+}
+
+// -----------------------------------------------------------------------------------------------
+// Implementation - Call Service
+// -----------------------------------------------------------------------------------------------
+
+template <typename RequestT, typename ReplyT>
 auto callService(Session& session, const TopicConfig& topic_config, const RequestT& request,
                  std::chrono::milliseconds timeout) -> std::vector<ServiceResponse<ReplyT>> {
   internal::checkTemplatedTypes<RequestT, ReplyT>();
@@ -311,8 +351,10 @@ auto callService(Session& session, const TopicConfig& topic_config, const Reques
   static constexpr auto FIFO_QUEUE_SIZE = 100;
   auto replies = session.zenoh_session.get(keyexpr, "", ::zenoh::channels::FifoChannel(FIFO_QUEUE_SIZE),
                                            std::move(options), &result);
-  throwExceptionIf<FailedZenohOperation>(result != Z_OK,
-                                         fmt::format("Failed to call service on '{}'", topic_config.name));
+  if (result != Z_OK) {
+    heph::log(heph::ERROR, "failed to call service, server error", "topic", topic_config.name);
+    return {};
+  }
 
   return internal::getServiceCallResponses<ReplyT>(replies);
 }

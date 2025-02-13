@@ -12,7 +12,7 @@
 
 namespace heph::utils::timing {
 
-StopWatch::StopWatch() {
+StopWatch::StopWatch(NowFunctionPtr now_fn) : now_fn_(now_fn) {
   reset();
 }
 
@@ -21,7 +21,7 @@ void StopWatch::start() {
     return;
   }
 
-  lap_start_timestamp_ = ClockT::now();
+  lap_start_timestamp_ = now_fn_();
   if (!initial_start_timestamp_.has_value()) {
     initial_start_timestamp_ = lap_start_timestamp_.value();
   }
@@ -37,11 +37,11 @@ void StopWatch::reset() {
 
 auto StopWatch::accumulatedLapsDuration() const -> ClockT::duration {
   return (lap_start_timestamp_.has_value() ?
-              (accumulated_time_ + (ClockT::now() - lap_start_timestamp_.value())) :
+              (accumulated_time_ + (now_fn_() - lap_start_timestamp_.value())) :
               accumulated_time_);
 }
 
-auto StopWatch::initialStartTimestamp() const -> std::optional<ClockT::time_point> {
+auto StopWatch::initialStartTimestamp() const -> std::optional<typename ClockT::time_point> {
   return initial_start_timestamp_;
 }
 
@@ -57,7 +57,7 @@ auto StopWatch::lapseImpl() -> ClockT::duration {
   auto lapse_start_timestamp =
       lapse_timestamp_.has_value() ? lapse_timestamp_.value() : lap_start_timestamp_.value();
 
-  lapse_timestamp_ = ClockT::now();
+  lapse_timestamp_ = now_fn_();
 
   return lapse_timestamp_.value() - lapse_start_timestamp;
 }
@@ -67,7 +67,7 @@ auto StopWatch::stopImpl() -> ClockT::duration {
     return {};
   }
 
-  auto stop_timestamp = ClockT::now();
+  auto stop_timestamp = now_fn_();
   const auto lap_time = stop_timestamp - lap_start_timestamp_.value();
 
   lap_start_timestamp_ = std::nullopt;
@@ -83,7 +83,6 @@ auto StopWatch::elapsedImpl() -> ClockT::duration {
     return {};
   }
 
-  return ClockT::now() - lap_start_timestamp_.value();
+  return now_fn_() - lap_start_timestamp_.value();
 }
-
 }  // namespace heph::utils::timing

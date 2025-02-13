@@ -28,7 +28,7 @@ define_module_library(
     fmt::fmt
     Eigen3::Eigen
     hephaestus::bag
-    hephaestus::action_server_types_proto
+    # hephaestus::action_server_types_proto
     mcap
     zstd::libzstd
   PRIVATE_LINK_LIBS ""

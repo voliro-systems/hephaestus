@@ -28,7 +28,7 @@ void checkMessageExchange(bool subscriber_dedicated_callback_thread) {
 
   auto session = createSession(createLocalConfig());
   const auto topic =
-      ipc::TopicConfig(fmt::format("test_topic/{}", random::random<std::string>(mt, 10, false, true)));
+      ipc::createTopicConfig(fmt::format("test_topic/{}", random::random<std::string>(mt, 10, false, true)));
 
   Publisher<types::DummyType> publisher(session, topic);
 
@@ -64,7 +64,7 @@ TEST(PublisherSubscriber, MismatchType) {
   Config config{};
   auto session = createSession(createLocalConfig());
   const auto topic =
-      ipc::TopicConfig(fmt::format("test_topic/{}", random::random<std::string>(mt, 10, false, true)));
+      ipc::createTopicConfig(fmt::format("test_topic/{}", random::random<std::string>(mt, 10, false, true)));
 
   Publisher<types::DummyType> publisher(session, topic);
 
@@ -92,7 +92,7 @@ TEST(PublisherSubscriber, PublisherTypeInfo) {
   auto mt = random::createRNG();
   auto session = createSession(createLocalConfig());
   const auto topic =
-      ipc::TopicConfig(fmt::format("test_topic/{}", random::random<std::string>(mt, 10, false, true)));
+      ipc::createTopicConfig(fmt::format("test_topic/{}", random::random<std::string>(mt, 10, false, true)));
 
   Publisher<types::DummyType> publisher(session, topic);
 
@@ -109,7 +109,7 @@ TEST(PublisherSubscriber, SubscriberTypeInfo) {
   auto mt = random::createRNG();
   auto session = createSession(createLocalConfig());
   const auto topic =
-      ipc::TopicConfig(fmt::format("test_topic/{}", random::random<std::string>(mt, 10, false, true)));
+      ipc::createTopicConfig(fmt::format("test_topic/{}", random::random<std::string>(mt, 10, false, true)));
 
   Subscriber<types::DummyType> subscriber(session, topic, [](const auto&, const auto&) {});
 

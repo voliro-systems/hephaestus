@@ -90,4 +90,16 @@ auto isEndpointTypeInfoServiceTopic(const std::string& topic) -> bool {
 
   return elements.front() == TOPIC_INFO_SERVICE_TOPIC_PREFIX;
 }
+
+auto createTypeInfoService(std::shared_ptr<Session>& session, const TopicConfig& topic_config,
+                           std::function<std::string(const std::string&)>&& callback)
+    -> std::unique_ptr<Service<std::string, std::string>> {
+  if (isEndpointTypeInfoServiceTopic(topic_config.name)) {
+    return nullptr;
+  }
+
+  return std::make_unique<Service<std::string, std::string>>(
+      session, TopicConfig{ getEndpointTypeInfoServiceTopic(topic_config.name) }, std::move(callback));
+}
+
 }  // namespace heph::ipc::zenoh

@@ -30,7 +30,7 @@ endif()
 
 # Extract version information
 execute_process(
-  COMMAND git describe --tags --abbrev=0
+  COMMAND git describe --tags --abbrev=0 --match "v[0-9]*.[0-9]*.[0-9]*"
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   OUTPUT_VARIABLE REPO_TAG
   ERROR_VARIABLE error_version_check
@@ -41,10 +41,6 @@ if(error_version_check)
   message(WARNING "Repo version check failed. Will use \"${REPO_TAG}\"")
 endif()
 
-# Extract major, minor and patch versions. NOTE: works only for repo tag in format vX.Y.Z
-if(NOT ${REPO_TAG} MATCHES "^v([0-9]+)\\.([0-9]+)\\.([0-9]+)(-.+)?$")
-  message(FATAL_ERROR "Expected version tag in format v1.2.3 or v1.2.3-*, got ${REPO_TAG}")
-endif()
 string(REGEX MATCHALL "[0-9]+" VERSION_ELEMENTS "${REPO_TAG}")
 list(GET VERSION_ELEMENTS 0 VERSION_MAJOR)
 list(GET VERSION_ELEMENTS 1 VERSION_MINOR)
@@ -52,4 +48,4 @@ list(GET VERSION_ELEMENTS 2 VERSION_PATCH)
 set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 # print all that
-message(STATUS "Version: ${VERSION}, branch: \"${REPO_BRANCH}\", commit hash: ${REPO_HASH}")
+message(STATUS "HEPHAESTUS: version: ${VERSION}, branch: \"${REPO_BRANCH}\", commit hash: ${REPO_HASH}")

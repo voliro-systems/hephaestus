@@ -12,6 +12,4 @@ struct TopicConfig {
   std::string name;
 };
 
-[[nodiscard]] TopicConfig createTopicConfig(const std::string& topic_name);
-
 }  // namespace heph::ipc

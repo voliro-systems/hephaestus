@@ -22,6 +22,10 @@ void appendProgramOption(cli::ProgramDescription& program_description,
   program_description.defineOption<std::string>("topic", "Key expression", default_topic)
       .defineFlag("use_binary_name_as_session_id", "Use the binary name as the session id")
       .defineOption<std::string>("session_id", "the session id", "")
+      .defineOption<std::string>("zenoh_config",
+                                 "path to a zenoh configuration file (either in yaml or json5 format). "
+                                 "Options set in here will get overriden by explicit command line options.",
+                                 "")
       .defineOption<std::size_t>("cache", "Cache size", 0)
       .defineOption<std::string>("mode", "Running mode: options: peer, client", "peer")
       .defineOption<std::string>("router", "Router endpoint", "")
@@ -29,7 +33,7 @@ void appendProgramOption(cli::ProgramDescription& program_description,
       .defineOption<std::string>("multicast_scouting_interface",
                                  "Interface to use for multicast, options: auto, <INTERFACE_NAME>", "auto")
       .defineFlag("shared_memory", "Enable shared memory")
-      .defineFlag("multicast_scouting_enabled", "Enable multicast scouting")
+      .defineFlag("disable_multicast_scouting", "Disable multicast scouting")
       .defineFlag("qos", "Enable QoS")
       .defineFlag("realtime", "Enable real-time communication");
 }
@@ -44,7 +48,10 @@ auto parseProgramOptions(const heph::cli::ProgramOptions& args) -> std::pair<Con
     config.id = std::move(session_id);
   }
 
-  config.cache_size = args.getOption<std::size_t>("cache");
+  auto zenoh_config_path = args.getOption<std::string>("zenoh_config");
+  if (!zenoh_config_path.empty()) {
+    config.zenoh_config_path.emplace(std::move(zenoh_config_path));
+  }
 
   auto mode = args.getOption<std::string>("mode");
   if (mode == "peer") {
@@ -52,7 +59,7 @@ auto parseProgramOptions(const heph::cli::ProgramOptions& args) -> std::pair<Con
   } else if (mode == "client") {
     config.mode = Mode::CLIENT;
   } else {
-    heph::throwException<heph::InvalidParameterException>(fmt::format("invalid mode value: {}", mode));
+    panic(fmt::format("invalid mode value: {}", mode));
   }
 
   auto protocol = args.getOption<std::string>("protocol");
@@ -63,13 +70,12 @@ auto parseProgramOptions(const heph::cli::ProgramOptions& args) -> std::pair<Con
   } else if (protocol == "tcp") {
     config.protocol = Protocol::TCP;
   } else {
-    heph::throwException<heph::InvalidParameterException>(
-        fmt::format("invalid value {} for option 'protocol'", protocol));
+    panic(fmt::format("invalid value {} for option 'protocol'", protocol));
   }
 
   config.router = args.getOption<std::string>("router");
   config.enable_shared_memory = args.getOption<bool>("shared_memory");
-  config.multicast_scouting_enabled = args.getOption<bool>("multicast_scouting_enabled");
+  config.multicast_scouting_enabled = !args.getOption<bool>("disable_multicast_scouting");
   config.multicast_scouting_interface = args.getOption<std::string>("multicast_scouting_interface");
   config.qos = args.getOption<bool>("qos");
   config.real_time = args.getOption<bool>("realtime");

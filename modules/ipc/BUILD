@@ -75,6 +75,16 @@ heph_cc_binary(
     ],
 )
 
+heph_cc_binary(
+    name = "zenoh_ipc_graph",
+    srcs = [
+        "apps/zenoh_ipc_graph.cpp",
+    ],
+    deps = [
+        ":ipc",
+    ],
+)
+
 #########
 # Tests #
 #########
@@ -90,10 +100,6 @@ heph_cc_test(
     name = "action_server_tests",
     srcs = [
         "tests/action_server_tests.cpp",
-    ],
-    tags = [
-        "exclusive",
-        "manual",  # This is currently flaky, so we need to improve it first
     ],
     deps = IPC_TEST_DEPS,
 )
@@ -139,6 +145,14 @@ heph_cc_test(
 )
 
 heph_cc_test(
+    name = "config_tests",
+    srcs = [
+        "tests/config_tests.cpp",
+    ],
+    deps = IPC_TEST_DEPS,
+)
+
+heph_cc_test(
     name = "session_tests",
     srcs = [
         "tests/session_tests.cpp",
@@ -150,6 +164,14 @@ heph_cc_test(
     name = "topic_database_tests",
     srcs = [
         "tests/topic_database_tests.cpp",
+    ],
+    deps = IPC_TEST_DEPS,
+)
+
+heph_cc_test(
+    name = "ipc_graph_tests",
+    srcs = [
+        "tests/ipc_graph_tests.cpp",
     ],
     deps = IPC_TEST_DEPS,
 )

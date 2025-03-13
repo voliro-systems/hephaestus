@@ -105,7 +105,7 @@ auto callServiceRaw(Session& session, const TopicConfig& topic_config, std::span
 [[nodiscard]] auto isEndpointTypeInfoServiceTopic(const std::string& topic) -> bool;
 
 [[nodiscard]] auto createTypeInfoService(std::shared_ptr<Session>& session, const TopicConfig& topic_config,
-                                         std::function<std::string(const std::string&)>&& callback)
+                                         Service<std::string, std::string>::Callback&& callback)
     -> std::unique_ptr<Service<std::string, std::string>>;
 
 // -----------------------------------------------------------------------------------------------
@@ -210,8 +210,8 @@ auto onReply(const ::zenoh::Sample& sample) -> ServiceResponse<ReplyT> {
 }
 
 template <typename RequestT, typename ReplyT>
-[[nodiscard]] auto createZenohGetOptions(const RequestT& request,
-                                         std::chrono::milliseconds timeout) -> ::zenoh::Session::GetOptions {
+[[nodiscard]] auto createZenohGetOptions(const RequestT& request, std::chrono::milliseconds timeout)
+    -> ::zenoh::Session::GetOptions {
   ::zenoh::Session::GetOptions options{};
   options.timeout_ms = static_cast<uint64_t>(timeout.count());
 
@@ -271,7 +271,8 @@ Service<RequestT, ReplyT>::Service(SessionPtr session, TopicConfig topic_config,
   heph::log(heph::DEBUG, "started service", "name", topic_config_.name);
 
   if (config.create_type_info_service) {
-    createTypeInfoService();
+    type_info_service_ = createTypeInfoService(
+        session_, topic_config_, [this](const std::string&) { return this->type_info_.toJson(); });
   }
 
   auto on_query_cb = [this](const ::zenoh::Query& query) mutable { onQuery(query); };
@@ -326,14 +327,6 @@ void Service<RequestT, ReplyT>::onQuery(const ::zenoh::Query& query) {
               result);
 
   post_reply_callback_();
-}
-
-template <typename RequestT, typename ReplyT>
-void Service<RequestT, ReplyT>::createTypeInfoService() {
-  type_info_service_ = std::make_unique<Service<std::string, std::string>>(
-      session_, TopicConfig{ getEndpointTypeInfoServiceTopic(topic_config_.name) },
-      [this](const std::string&) { return this->type_info_.toJson(); }, []() {}, []() {},
-      ServiceConfig{ .create_liveliness_token = false, .create_type_info_service = false });
 }
 
 // -----------------------------------------------------------------------------------------------

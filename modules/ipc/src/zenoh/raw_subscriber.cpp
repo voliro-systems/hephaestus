@@ -104,12 +104,7 @@ RawSubscriber::RawSubscriber(SessionPtr session, TopicConfig topic_config, DataC
     callback_messages_consumer_ = std::make_unique<concurrency::MessageQueueConsumer<Message>>(
         [this](const Message& message) {
           const auto& [metadata, buffer] = message;
-          try {
-            callback_(metadata, std::span<const std::byte>(buffer.begin(), buffer.end()));
-          } catch (std::exception& e) {
-            heph::log(heph::FATAL, "Uncaught exception in RawSubscriber callback", "topic",
-                      topic_config_.name, "exception", e.what());
-          }
+          callback_(metadata, std::span<const std::byte>(buffer.begin(), buffer.end()));
         },
         DEFAULT_CACHE_RESERVES);
     callback_messages_consumer_->start();

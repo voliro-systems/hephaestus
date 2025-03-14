@@ -34,10 +34,11 @@ auto main(int argc, const char* argv[]) -> int {
     heph::ipc::zenoh::appendProgramOption(desc, getDefaultTopic(ExampleType::SERVICE_SERVER));
     const auto args = std::move(desc).parse(argc, argv);
     auto [session_config, topic_config] = heph::ipc::zenoh::parseProgramOptions(args);
-    auto session = heph::ipc::zenoh::createSession(std::move(session_config));
+    auto session = heph::ipc::zenoh::createSession(session_config);
 
     auto callback = [](const heph::examples::types::Pose& sample) {
       fmt::println("received query: pose = {}", sample);
+
       return heph::examples::types::Pose{
         .orientation = Eigen::Quaterniond{ 1., 0.1, 0.2, 0.3 },  // NOLINT
         .position = Eigen::Vector3d{ 1, 2, 3 },                  // NOLINT

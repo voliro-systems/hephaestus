@@ -92,14 +92,28 @@ auto isEndpointTypeInfoServiceTopic(const std::string& topic) -> bool {
 }
 
 auto createTypeInfoService(std::shared_ptr<Session>& session, const TopicConfig& topic_config,
-                           std::function<std::string(const std::string&)>&& callback)
+                           Service<std::string, std::string>::Callback&& callback)
     -> std::unique_ptr<Service<std::string, std::string>> {
   if (isEndpointTypeInfoServiceTopic(topic_config.name)) {
     return nullptr;
   }
 
+  auto failure_callback = [&topic_config]() {
+    heph::log(heph::ERROR, "Failed to process type info service", "service_topic", topic_config.name);
+  };
+
+  auto post_reply_callback = []() {
+    // Do nothing.
+  };
+
+  ServiceConfig service_config = {
+    .create_liveliness_token = false,
+    .create_type_info_service = false,
+  };
+
   return std::make_unique<Service<std::string, std::string>>(
-      session, TopicConfig{ getEndpointTypeInfoServiceTopic(topic_config.name) }, std::move(callback));
+      session, TopicConfig{ getEndpointTypeInfoServiceTopic(topic_config.name) }, std::move(callback),
+      failure_callback, post_reply_callback, service_config);
 }
 
 }  // namespace heph::ipc::zenoh

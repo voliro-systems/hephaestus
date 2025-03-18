@@ -3,7 +3,7 @@
 # =================================================================================================
 
 cc_library(
-    name = "ws_protocol",
+    name = "foxglove_websocket",
     srcs = glob([
         "cpp/foxglove-websocket/src/*.cpp",
     ]),

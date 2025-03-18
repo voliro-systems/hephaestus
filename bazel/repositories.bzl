@@ -76,8 +76,8 @@ cc_library(
     WS_PROTOCOL_VERSION = "1.4.0-dev"
     WS_PROTOCOL_TAG = "releases/cpp/v" + WS_PROTOCOL_VERSION
     http_archive(
-        name = "ws_protocol",
-        build_file = ":foreign_cc/ws_protocol.BUILD",
+        name = "foxglove_websocket",
+        build_file = ":foreign_cc/foxglove_websocket.BUILD",
         urls = ["https://github.com/olympus-robotics/ws-protocol/archive/refs/tags/{tag}.zip".format(tag = WS_PROTOCOL_TAG)],
         strip_prefix = "ws-protocol-releases-cpp-v" + WS_PROTOCOL_VERSION,
         sha256 = "1c7d7b874f2e20d841cd04391d9d0be507ccb75b22f84b65a0fc61a30ac30651",

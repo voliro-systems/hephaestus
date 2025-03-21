@@ -9,6 +9,8 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 
 def heph_basic_copts():
     return [
+        "-g3",  # Enable debugging symbols
+        "-fno-omit-frame-pointer",  # Increase debugging experience without sacrificing too much performance
         "-Wall",
         "-Wextra",
         "-Wpedantic",
@@ -58,7 +60,7 @@ def heph_copts():
     }) + heph_basic_copts()
 
 def heph_linkopts():
-    return select({
+    return ["-g3"] + select({
         "@hephaestus//bazel:clang_compiler": [],
         "@hephaestus//bazel:gcc_compiler": [],
     }) + select({
@@ -109,6 +111,11 @@ def heph_cc_binary(
     cc_binary(
         copts = heph_copts() + copts,
         linkopts = heph_linkopts() + linkopts,
+        env = {
+            # Leak detection currently doesn't work due to zenoh
+            "ASAN_OPTIONS": "detect_leaks=0",
+            "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1",
+        },
         **kwargs
     )
 
@@ -126,6 +133,12 @@ def heph_cc_test(
             "@googletest//:gtest",
             "@googletest//:gtest_main",
         ],
+        env = {
+            # Leak detection currently doesn't work due to zenoh
+            "ASAN_OPTIONS": "detect_leaks=0",
+            "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1",
+            "RUST_BACKTRACE": "full",
+        },
         tags = tags + ["no-clang-tidy"],  # NOTE: we need this to avoid all googletest issues
         size = size,
         **kwargs

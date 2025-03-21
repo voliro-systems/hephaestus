@@ -39,7 +39,7 @@ auto main(int argc, const char* argv[]) -> int {
 
     heph::log(heph::DEBUG, "opening session", "subscriber_name", topic_config.name);
 
-    auto session = heph::ipc::zenoh::createSession(std::move(session_config));
+    auto session = heph::ipc::zenoh::createSession(session_config);
 
     auto cb = [topic = topic_config.name](const heph::ipc::zenoh::MessageMetadata& metadata,
                                           const std::shared_ptr<heph::examples::types::Pose>& pose) {
@@ -48,8 +48,11 @@ auto main(int argc, const char* argv[]) -> int {
                        std::chrono::duration_cast<std::chrono::system_clock::duration>(metadata.timestamp) },
                    metadata.topic, metadata.sender_id, metadata.sequence_id, *pose);
     };
+
+    heph::ipc::zenoh::SubscriberConfig config;
+    config.dedicated_callback_thread = true;
     auto subscriber = heph::ipc::zenoh::createSubscriber<heph::examples::types::Pose>(
-        session, std::move(topic_config), std::move(cb), true);
+        session, std::move(topic_config), std::move(cb), config);
     (void)subscriber;
 
     heph::utils::TerminationBlocker::waitForInterrupt();

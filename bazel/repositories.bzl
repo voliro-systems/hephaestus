@@ -64,11 +64,21 @@ cc_library(
         sha256 = "374f5cff1cabc5ce8ff0d4b227475e2221c038b668a797fd9ef117bee43ead07",
     )
 
-    REFLECT_CPP_VERSION = "0.16.0"
+    REFLECT_CPP_VERSION = "c118963de004b32f12b04636bbc525066f792673"
     http_archive(
         name = "reflect-cpp",
         build_file = "//bazel/foreign_cc:reflect_cpp.BUILD",
-        urls = ["https://github.com/voliro-systems/reflect-cpp/archive/refs/tags/v{version}-cmake-3.22.1.zip".format(version = REFLECT_CPP_VERSION)],
-        strip_prefix = "reflect-cpp-" + REFLECT_CPP_VERSION + "-cmake-3.22.1",
-        sha256 = "63fd52189f7df9c5648c5479e7af9377271a18f65a30a1a45fe160f8e0cf787a",
+        urls = ["https://github.com/getml/reflect-cpp/archive/{version}.zip".format(version = REFLECT_CPP_VERSION)],
+        strip_prefix = "reflect-cpp-" + REFLECT_CPP_VERSION,
+        sha256 = "3e34090fe5202c46b6247afbed7d0b10bd569db2c31463842846b3e419c57ecc",
+    )
+
+    WS_PROTOCOL_VERSION = "1.4.0-dev"
+    WS_PROTOCOL_TAG = "releases/cpp/v" + WS_PROTOCOL_VERSION
+    http_archive(
+        name = "foxglove_websocket",
+        build_file = ":foreign_cc/foxglove_websocket.BUILD",
+        urls = ["https://github.com/olympus-robotics/ws-protocol/archive/refs/tags/{tag}.zip".format(tag = WS_PROTOCOL_TAG)],
+        strip_prefix = "ws-protocol-releases-cpp-v" + WS_PROTOCOL_VERSION,
+        sha256 = "1c7d7b874f2e20d841cd04391d9d0be507ccb75b22f84b65a0fc61a30ac30651",
     )

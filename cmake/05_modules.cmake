@@ -505,7 +505,7 @@ macro(define_module_proto_library)
   list(REMOVE_DUPLICATES PROTOBUF_DEP_PATHS)
 
   # This var should contain paths to all .proto files in use, even imported.
-  set(PROTOBUF_IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${PROTOBUF_DEP_PATHS})
+  set(PROTOBUF_IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${PROTOBUF_DEP_PATHS} ${Protobuf_INCLUDE_DIRS})
 
   protobuf_generate_cpp(PROTOBUF_SOURCES PROTOBUF_HEADERS ${TARGET_ARG_SOURCES})
 

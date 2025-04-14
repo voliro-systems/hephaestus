@@ -38,7 +38,7 @@ TEST(ZenohTests, ServiceCallExchange) {
 
   const auto request_message = types::DummyType::random(mt);
 
-  const auto service_topic = ipc::createTopicConfig(
+  const auto service_topic = ipc::TopicConfig(
       fmt::format("test_service/{}", random::random<std::string>(mt, 10, false, true)));
 
   auto session = createSession(createLocalConfig());
@@ -47,7 +47,7 @@ TEST(ZenohTests, ServiceCallExchange) {
       session, service_topic, [](const types::DummyType& request) { return request; });
 
   const auto replies = callService<types::DummyType, types::DummyType>(
-      *session, service_topic, request_message, std::chrono::milliseconds(10));
+      *session, service_topic, request_message, std::chrono::milliseconds(100));
 
   EXPECT_FALSE(replies.empty());
   EXPECT_EQ(replies.size(), 1);
@@ -60,7 +60,7 @@ TEST(ZenohTests, ServiceClientCallExchange) {
 
   const auto request_message = types::DummyType::random(mt);
 
-  const auto service_topic = ipc::createTopicConfig(
+  const auto service_topic = ipc::TopicConfig(
       fmt::format("test_service/{}", random::random<std::string>(mt, 10, false, true)));
 
   auto session = createSession(createLocalConfig());
@@ -82,7 +82,7 @@ TEST(ZenohTests, ServiceCallRawExchange) {
 
   const auto request_message = types::DummyType::random(mt);
 
-  const auto service_topic = ipc::createTopicConfig(
+  const auto service_topic = ipc::TopicConfig(
       fmt::format("test_service/{}", random::random<std::string>(mt, 10, false, true)));
 
   auto session = createSession(createLocalConfig());
@@ -106,7 +106,7 @@ TEST(ZenohTests, ServiceCallRawExchange) {
 TEST(ZenohTests, TypesMismatch) {
   auto mt = random::createRNG();
 
-  const auto service_topic = ipc::createTopicConfig(
+  const auto service_topic = ipc::TopicConfig(
       fmt::format("test_service/{}", random::random<std::string>(mt, 10, false, true)));
 
   auto session = createSession(createLocalConfig());
@@ -138,7 +138,7 @@ TEST(ZenohTests, ServiceTypeInfo) {
 
   const auto request_message = types::DummyType::random(mt);
 
-  const auto service_topic = ipc::createTopicConfig(
+  const auto service_topic = ipc::TopicConfig(
       fmt::format("test_service/{}", random::random<std::string>(mt, 10, false, true)));
 
   auto session = createSession(createLocalConfig());

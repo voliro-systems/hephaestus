@@ -32,7 +32,7 @@ class Subscriber : public SubscriberBase {
 public:
   using DataCallback = std::function<void(const MessageMetadata&, const std::shared_ptr<T>&)>;
   Subscriber(zenoh::SessionPtr session, TopicConfig topic_config, DataCallback&& callback,
-             bool dedicated_callback_thread = false)
+             const SubscriberConfig& config = {})
     : subscriber_(
           std::move(session), std::move(topic_config),
           [callback = std::move(callback), this](const MessageMetadata& metadata,
@@ -43,7 +43,7 @@ public:
             serdes::deserialize(buffer, *data);
             callback(metadata, std::move(data));
           },
-          serdes::getSerializedTypeInfo<T>(), dedicated_callback_thread) {
+          serdes::getSerializedTypeInfo<T>(), config) {
   }
 
 private:
@@ -52,9 +52,8 @@ private:
     if (metadata.type_info != serialized_type) {
       heph::log(heph::ERROR, "subscriber type mismatch; terminating", "topic", metadata.topic,
                 "subscriber_type", serialized_type, "topic_type", metadata.type_info);
-      throwException<FailedZenohOperation>(
-          fmt::format("Topic '{}' is of type '{}', but subscriber expect type '{}'", metadata.topic,
-                      metadata.type_info, serialized_type));
+      panic(fmt::format("Topic '{}' is of type '{}', but subscriber expect type '{}'", metadata.topic,
+                        metadata.type_info, serialized_type));
     }
   }
 
@@ -74,10 +73,9 @@ private:
 template <typename T>
 [[nodiscard]] auto createSubscriber(zenoh::SessionPtr session, TopicConfig topic_config,
                                     typename Subscriber<T>::DataCallback&& callback,
-                                    bool dedicated_callback_thread = false)
-    -> std::unique_ptr<Subscriber<T>> {
+                                    const SubscriberConfig& config = {}) -> std::unique_ptr<Subscriber<T>> {
   return std::make_unique<Subscriber<T>>(std::move(session), std::move(topic_config), std::move(callback),
-                                         dedicated_callback_thread);
+                                         config);
 }
 
 }  // namespace heph::ipc::zenoh

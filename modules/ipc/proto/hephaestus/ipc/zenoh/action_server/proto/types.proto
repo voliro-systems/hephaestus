@@ -4,12 +4,18 @@ package heph.ipc.zenoh.action_server.proto;
 
 import "google/protobuf/any.proto";
 
+message Request {
+  google.protobuf.Any request = 1;
+  string uid = 2;
+}
+
 enum RequestStatus {
-  REQUEST_STATUS_SUCCESSFUL = 0;
-  REQUEST_STATUS_REJECTED_USER = 1;
-  REQUEST_STATUS_REJECTED_ALREADY_RUNNING = 2;
-  REQUEST_STATUS_INVALID = 3;
-  REQUEST_STATUS_STOPPED = 4;
+  REQUEST_STATUS_UNSPECIFIED = 0;
+  REQUEST_STATUS_SUCCESSFUL = 1;
+  REQUEST_STATUS_REJECTED_USER = 2;
+  REQUEST_STATUS_REJECTED_ALREADY_RUNNING = 3;
+  REQUEST_STATUS_INVALID = 4;
+  REQUEST_STATUS_STOPPED = 5;
 }
 
 message RequestResponse {

@@ -19,6 +19,7 @@ heph_cc_library(
     deps = [
         "//modules/utils",
         "@fmt",
+        "@magic_enum",
         "@reflect-cpp",
     ],
 )
@@ -56,5 +57,14 @@ heph_cc_test(
     srcs = ["tests/formatter_collisions_tests.cpp"],
     deps = [
         ":format",
+    ],
+)
+
+heph_cc_test(
+    name = "types_formatter_tests",
+    srcs = ["tests/types_formatter_tests.cpp"],
+    deps = [
+        ":format",
+        "//modules/types",
     ],
 )

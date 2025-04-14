@@ -43,9 +43,8 @@ auto main(int argc, const char* argv[]) -> int {
 
     heph::log(heph::DEBUG, "reading bag", "file", input_file.string());
 
-    heph::throwExceptionIf<heph::InvalidDataException>(
-        !std::filesystem::exists(input_file),
-        fmt::format("input bag file {} doesn't exist", input_file.string()));
+    heph::panicIf(!std::filesystem::exists(input_file),
+                  fmt::format("input bag file {} doesn't exist", input_file.string()));
     auto bag_reader = std::make_unique<mcap::McapReader>();
     const auto status = bag_reader->open(input_file.string());
     if (status.code != mcap::StatusCode::Success) {
@@ -53,7 +52,7 @@ auto main(int argc, const char* argv[]) -> int {
       std::exit(1);
     }
 
-    heph::bag::ZenohPlayerParams params{ .session = heph::ipc::zenoh::createSession(std::move(config)),
+    heph::bag::ZenohPlayerParams params{ .session = heph::ipc::zenoh::createSession(config),
                                          .bag_reader = std::move(bag_reader),
                                          .wait_for_readers_to_connect = wait_for_readers_to_connect };
     auto zenoh_player = heph::bag::ZenohPlayer::create(std::move(params));

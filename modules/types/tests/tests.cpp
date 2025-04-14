@@ -28,22 +28,6 @@ using TypeImplementations = ::testing::Types<IntegerBoundsT, FloatingPointBounds
 
 TYPED_TEST_SUITE(TypeTests, TypeImplementations);
 
-TYPED_TEST(TypeTests, OstreamTest) {
-  const TypeParam type;
-  std::stringstream ss;
-  EXPECT_TRUE(ss.str().empty());
-  ss << type;
-  EXPECT_FALSE(ss.str().empty());
-}
-
-TYPED_TEST(TypeTests, FmtFormatTest) {
-  TypeParam type;
-  std::string fmt_stream;
-  EXPECT_TRUE(fmt_stream.empty());
-  fmt_stream = fmt::format("{}", type);
-  EXPECT_FALSE(fmt_stream.empty());
-}
-
 TYPED_TEST(TypeTests, RandomUnequalTest) {
   auto [mt, mt_copy] = heph::random::createPairOfIdenticalRNGs();
 

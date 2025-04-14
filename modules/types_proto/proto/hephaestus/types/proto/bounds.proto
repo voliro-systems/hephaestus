@@ -9,10 +9,11 @@ package heph.types.proto;
 import "hephaestus/types/proto/numeric_value.proto";
 
 enum BoundsType {
-  BOUNDS_TYPE_INCLUSIVE = 0;
-  BOUNDS_TYPE_LEFT_OPEN = 1;
-  BOUNDS_TYPE_RIGHT_OPEN = 2;
-  BOUNDS_TYPE_OPEN = 3;
+  BOUNDS_TYPE_UNSPECIFIED = 0;
+  BOUNDS_TYPE_INCLUSIVE = 1;
+  BOUNDS_TYPE_LEFT_OPEN = 2;
+  BOUNDS_TYPE_RIGHT_OPEN = 3;
+  BOUNDS_TYPE_OPEN = 4;
 }
 
 message Bounds {

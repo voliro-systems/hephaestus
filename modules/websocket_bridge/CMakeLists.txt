@@ -5,13 +5,10 @@
 declare_module(
         NAME websocket_bridge
         DEPENDS_ON_MODULES ipc cli concurrency containers utils serdes telemetry
-        DEPENDS_ON_EXTERNAL_PROJECTS  absl fmt nlohmann_json zenohc zenohcxx foxglove_websocket OpenSSL reflectcpp ZLIB)
+        DEPENDS_ON_EXTERNAL_PROJECTS  absl fmt foxglove_websocket OpenSSL reflectcpp ZLIB)
 
 find_package(absl REQUIRED)
 find_package(fmt REQUIRED)
-find_package(nlohmann_json REQUIRED)
-find_package(zenohc REQUIRED)
-find_package(zenohcxx REQUIRED)
 find_package(foxglove_websocket REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(reflectcpp REQUIRED)
@@ -34,21 +31,11 @@ define_module_library(
                 absl::log
                 fmt::fmt
                 foxglove::foxglove_websocket
-                hephaestus::action_server_types_proto
-                hephaestus::cli
-                hephaestus::concurrency
-                hephaestus::containers
                 hephaestus::ipc
-                hephaestus::serdes
-                hephaestus::telemetry
-                hephaestus::utils
-                nlohmann_json::nlohmann_json
                 OpenSSL::Crypto
                 OpenSSL::SSL
                 reflectcpp::reflectcpp
                 yaml-cpp
-                zenohc::lib
-                zenohcxx::zenohc
                 ZLIB::ZLIB
         PRIVATE_LINK_LIBS ""
         SOURCES ${SOURCES} README.md
@@ -56,7 +43,9 @@ define_module_library(
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:include>
         PRIVATE_INCLUDE_PATHS ""
-        SYSTEM_PRIVATE_INCLUDE_PATHS "")
+        SYSTEM_PRIVATE_INCLUDE_PATHS ""
+)
+target_compile_definitions(hephaestus_websocket_bridge PUBLIC ZENOH_WITH_UNSTABLE_API Z_FEATURE_UNSTABLE_API ZENOHCXX_ZENOHC)
 
 # Subprojects
 add_subdirectory(tests)

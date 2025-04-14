@@ -8,7 +8,29 @@ def foreign_cc_repositories():
     ZENOH_VERSION = "1.2.1"
     http_archive(
         name = "zenohc_builder",
-        build_file = ":foreign_cc/zenohc_builder.BUILD",
+        build_file_content = """
+cc_library(
+    name = "zenoh-c",
+    srcs = ["lib/libzenohc.a"],
+    hdrs = glob(["include/**/*.h"]),
+    includes = ["include"],
+    defines = [
+        "ZENOH_WITH_UNSTABLE_API",
+        "ZENOHCXX_ZENOHC",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "zenoh-cpp",
+    hdrs = glob([
+        "include/**/*.hxx",
+    ]),
+    includes = ["include"],
+    visibility = ["//visibility:public"],
+    deps = [":zenoh-c"],
+)
+        """,
         urls = ["https://github.com/olympus-robotics/zenohc_builder/archive/refs/tags/{version}.zip".format(version = ZENOH_VERSION)],
         strip_prefix = "zenohc_builder-{version}".format(version = ZENOH_VERSION),
         sha256 = "b6015958b7924f721b76f688a6ae4b8c55548192d43de4be3ab0a15af0e3b46f",
@@ -54,9 +76,9 @@ def foreign_cc_repositories():
     WS_PROTOCOL_VERSION = "1.4.0-dev"
     WS_PROTOCOL_TAG = "releases/cpp/v" + WS_PROTOCOL_VERSION
     http_archive(
-        name = "ws_protocol",
-        build_file = ":foreign_cc/ws_protocol.BUILD",
+        name = "foxglove_websocket",
+        build_file = ":foreign_cc/foxglove_websocket.BUILD",
         urls = ["https://github.com/olympus-robotics/ws-protocol/archive/refs/tags/{tag}.zip".format(tag = WS_PROTOCOL_TAG)],
         strip_prefix = "ws-protocol-releases-cpp-v" + WS_PROTOCOL_VERSION,
-        sha256 = "86bd5743098825822b26b0459f4115b86694fdc86398ba7e84e296b6af4bdc23",
+        sha256 = "1c7d7b874f2e20d841cd04391d9d0be507ccb75b22f84b65a0fc61a30ac30651",
     )

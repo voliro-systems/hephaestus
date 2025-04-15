@@ -76,6 +76,9 @@ RawSubscriber::RawSubscriber(SessionPtr session, TopicConfig topic_config, DataC
     createTypeInfoService();
   }
 
+  // We need to ensure no parallel execution of the constructor and the callback.
+  const absl::MutexLock lock(&mutex_);
+
   auto sub_options = ::zenoh::ext::SessionExt::AdvancedSubscriberOptions::create_default();
   if (config.cache_size.has_value() && *config.cache_size > 0) {
     sub_options.history =
@@ -113,6 +116,9 @@ RawSubscriber::RawSubscriber(SessionPtr session, TopicConfig topic_config, DataC
 
 // NOLINTNEXTLINE(bugprone-exception-escape)
 RawSubscriber::~RawSubscriber() {
+  const absl::MutexLock lock(&mutex_);
+  stopped_ = true;
+
   if (callback_messages_consumer_ != nullptr) {
     auto stopped = callback_messages_consumer_->stop();
     stopped.get();
@@ -120,24 +126,30 @@ RawSubscriber::~RawSubscriber() {
 
   try {
     std::move(*subscriber_).undeclare();
-  } catch (std::exception& e) {
+  } catch (const std::exception& e) {
     heph::log(heph::ERROR, "failed to undeclare subscriber", "topic", topic_config_.name, "exception",
               e.what());
   }
 }
 
 void RawSubscriber::callback(const ::zenoh::Sample& sample) {
+  const absl::MutexLock lock(&mutex_);
+  if (stopped_) {
+    return;
+  }
+
   const auto metadata = getMetadata(sample, topic_config_.name);
   auto payload = toByteVector(sample.get_payload());
 
   if (dedicated_callback_thread_) {
-    callback_messages_consumer_->queue().forceEmplace(metadata, std::move(payload));
+    CHECK_NOTNULL(callback_messages_consumer_)->queue().forceEmplace(metadata, std::move(payload));
   } else {
     callback_(metadata, { payload.data(), payload.size() });
   }
 }
 
 void RawSubscriber::createTypeInfoService() {
+  const absl::MutexLock lock(&mutex_);
   auto type_info_json = this->type_info_.toJson();
   auto type_info_callback = [type_info_json](const auto& request) {
     (void)request;

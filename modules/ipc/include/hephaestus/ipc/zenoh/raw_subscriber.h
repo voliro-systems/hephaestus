@@ -14,6 +14,8 @@
 #include <utility>
 #include <vector>
 
+#include <absl/base/thread_annotations.h>
+#include <absl/synchronization/mutex.h>
 #include <zenoh/api/ext/advanced_subscriber.hxx>
 #include <zenoh/api/liveliness.hxx>
 #include <zenoh/api/sample.hxx>
@@ -63,20 +65,24 @@ private:
 private:
   using Message = std::pair<MessageMetadata, std::vector<std::byte>>;
 
-  SessionPtr session_;
-  TopicConfig topic_config_;
+  const SessionPtr session_;
+  const TopicConfig topic_config_;
 
-  DataCallback callback_;
+  const DataCallback callback_;
 
-  std::unique_ptr<::zenoh::ext::AdvancedSubscriber<void>> subscriber_;
-  std::unique_ptr<::zenoh::LivelinessToken> liveliness_token_;
+  std::unique_ptr<::zenoh::ext::AdvancedSubscriber<void>> subscriber_ ABSL_GUARDED_BY(mutex_);
+  std::unique_ptr<::zenoh::LivelinessToken> liveliness_token_ ABSL_GUARDED_BY(mutex_);
 
-  serdes::TypeInfo type_info_;
-  std::unique_ptr<Service<std::string, std::string>> type_service_;
+  const serdes::TypeInfo type_info_;
+  std::unique_ptr<Service<std::string, std::string>> type_service_ ABSL_GUARDED_BY(mutex_);
 
-  bool dedicated_callback_thread_;
+  const bool dedicated_callback_thread_;
   static constexpr std::size_t DEFAULT_CACHE_RESERVES = 100;
-  std::unique_ptr<concurrency::MessageQueueConsumer<Message>> callback_messages_consumer_;
+  std::unique_ptr<concurrency::MessageQueueConsumer<Message>>
+      callback_messages_consumer_ ABSL_GUARDED_BY(mutex_);
+
+  bool stopped_ ABSL_GUARDED_BY(mutex_) = false;
+  mutable absl::Mutex mutex_;
 };
 
 }  // namespace heph::ipc::zenoh

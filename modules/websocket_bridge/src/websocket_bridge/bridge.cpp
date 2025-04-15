@@ -747,7 +747,8 @@ void WebsocketBridge::callback_Ws_ServiceRequest(const WsServiceRequest& request
   const WsServiceId service_id = request.serviceId;
   const WsServiceCallId call_id = request.callId;
   heph::log(heph::INFO, "[WS Bridge] - Client sent service request ...", "client_name", client_name,
-            "service_name", service_name, "service_id", service_id, "call_id", call_id);
+            "service_name", service_name, "service_id", service_id, "call_id", call_id, "timeout_ms",
+            request.timeoutMs);
 
   const ipc::TopicConfig topic_config(service_name);
 

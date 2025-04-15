@@ -18,6 +18,9 @@ namespace heph::telemetry {
 AbslLogSink::AbslLogSink(LogLevel log_level)
   : formatter_([](const LogEntry& l) { return fmt::format("{}", l); }) {
   switch (log_level) {
+    case LogLevel::VERBOSE:
+      // Don't set the global vlog level but use the one from --v in the command line
+      break;
     case LogLevel::TRACE:
       absl::SetGlobalVLogLevel(2);
       break;

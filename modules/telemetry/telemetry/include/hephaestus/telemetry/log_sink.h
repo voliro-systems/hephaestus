@@ -26,7 +26,7 @@
 namespace heph {
 ///@brief Forward declaration of LogLevel. Definition is in log.h, since we only want to include that when
 /// logging.
-enum LogLevel : std::uint8_t { TRACE, DEBUG, INFO, WARN, ERROR, FATAL };
+enum LogLevel : std::uint8_t { VERBOSE, TRACE, DEBUG, INFO, WARN, ERROR, FATAL };
 }  // namespace heph
 
 namespace heph::telemetry {
